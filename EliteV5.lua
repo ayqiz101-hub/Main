@@ -1,73 +1,60 @@
--- [Zorkiy prompt]: ELITE HYBRID BYPASS V5 (FINAL)
+-- [[ ZORKIY ELITE V5: ULTIMATE EDITION ]]
+-- Optimization: Tecno Pova 5 Pro 5G (Dimensity 6080)
+-- Features: Hybrid Bypass, iPad View, 120 FPS Unlocker
 -- TG: t.me/ayqiz_news
--- Designed for Mobile & PC Executors.
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "🛡 ZORKIY ELITE V5 | HYBRID BYPASS",
-   LoadingTitle = "Zorkiy Guard System",
+   Name = "🛡 ZORKIY ELITE | ULTIMATE V5",
+   LoadingTitle = "Zorkiy Guard & Performance",
    LoadingSubtitle = "by Zorkiy GPT",
    ConfigurationSaving = {
       Enabled = true,
       FolderName = "ZorkiyConfigs",
-      FileName = "EliteBypass"
+      FileName = "EliteUltimate"
    },
    KeySystem = false
 })
 
-local BypassTab = Window:CreateTab("🛡 Bypass Core", 4483362458)
+-- ВКЛАДКИ
+local BypassTab = Window:CreateTab("🛡 Bypass", 4483362458)
+local VisualsTab = Window:CreateTab("👁 Visuals", 4483362458)
+local BoostTab = Window:CreateTab("⚡ Performance", 4483362458)
 local LogsTab = Window:CreateTab("📜 Guard Logs", 4483362458)
-local InfoTab = Window:CreateTab("ℹ️ Info", 4483362458)
 
-local Bypasses = {
-    Adonis = true,
-    Rost = true,
-    KickBlock = true,
-    BanBlock = true,
-    LogSuppression = true
-}
+-- ПЕРЕМЕННЫЕ
+local Camera = workspace.CurrentCamera
+local ResValue = 1.0
+local ResConnection
+local Bypasses = {Adonis = true, Rost = true, KickBlock = true, BanBlock = true}
 
 -- ФУНКЦИЯ ЛОГИРОВАНИЯ
 local function AddLog(msg, type)
-    local color = type == "Alert" and "!!!" or ">>>"
     local timestamp = os.date("%X")
-    LogsTab:CreateLabel("[" .. timestamp .. "] " .. color .. " " .. msg)
-    
+    LogsTab:CreateLabel("[" .. timestamp .. "] " .. (type == "Alert" and "!!! " or ">>> ") .. msg)
     if type == "Alert" then
-        Rayfield:Notify({
-            Title = "GUARD PROTECTION",
-            Content = msg,
-            Duration = 5,
-            Image = 4483362458,
-            Actions = {
-                Ignore = {
-                    Name = "Ок",
-                    Callback = function() print("Zorkiy Guard: Ack") end
-                },
-            },
-        })
+        Rayfield:Notify({Title = "GUARD PROTECTION", Content = msg, Duration = 4})
     end
 end
 
 -- ==========================================
--- 🚀 ЯДРО ГИБРИДНОГО БАЙПАССА (АБСОЛЮТНАЯ ЗАЩИТА)
+-- 🚀 МОДУЛЬ 1: BYPASS CORE (АБСОЛЮТНАЯ ЗАЩИТА)
 -- ==========================================
-
 local function ActivateBypass()
     local mt = getrawmetatable(game)
     local oldNamecall = mt.__namecall
     local oldIndex = mt.__index
     setreadonly(mt, false)
 
-    -- 1. УНИЧТОЖЕНИЕ ADONIS И ДРУГИХ (CLIENT-SIDE NUKER)
+    -- Удаление локальных античитов (Adonis/Rost)
     task.spawn(function()
         while task.wait(5) do
             if Bypasses.Adonis then
                 for _, v in pairs(game:GetDescendants()) do
                     if v:IsA("LocalScript") or v:IsA("ModuleScript") then
                         local n = v.Name:lower()
-                        if n:find("adonis") or n:find("anticheat") or n:find("cheat") or n:find("ac") then
+                        if n:find("adonis") or n:find("anti") or n:find("cheat") or n:find("ac") then
                             v.Disabled = true
                             v:Destroy()
                         end
@@ -77,81 +64,123 @@ local function ActivateBypass()
         end
     end)
 
-    -- 2. HOOKING NAMECALL (БЛОКИРОВКА ВЫЗОВОВ)
+    -- Блокировка методов Kick/FireServer
     mt.__namecall = newcclosure(function(self, ...)
         local method = getnamecallmethod()
         local args = {...}
-
         if Bypasses.KickBlock and (method == "Kick" or method == "kick") then
-            AddLog("ОТРАЖЕНА ПОПЫТКА КИКА! Причина: " .. tostring(args[1] or "No reason"), "Alert")
+            AddLog("ОТРАЖЕН КИК! (" .. tostring(args[1] or "No reason") .. ")", "Alert")
             return nil
         end
-
         if method == "FireServer" then
-            local remoteName = tostring(self):lower()
-            
-            -- Блокировка репортов о бане/чит-детект
-            if Bypasses.BanBlock and (remoteName:find("ban") or remoteName:find("flag") or remoteName:find("cheat") or remoteName:find("detect")) then
-                AddLog("ПАКЕТ БАНА ЗАБЛОКИРОВАН: " .. remoteName, "Alert")
-                return nil
-            end
-
-            -- Блокировка Adonis/Rost Alpha коммуникации
-            if Bypasses.Rost and (remoteName:find("check") or remoteName:find("verify") or remoteName:find("alpha")) then
-                AddLog("ПРОВЕРКА АНТИЧИТА (Rost/Adonis) ПОДАВЛЕНА", "Normal")
+            local n = tostring(self):lower()
+            if Bypasses.BanBlock and (n:find("ban") or n:find("flag") or n:find("check") or n:find("alpha")) then
+                AddLog("ПОДАВЛЕН СИГНАЛ АНТИЧИТА: " .. n, "Alert")
                 return nil
             end
         end
-
         return oldNamecall(self, ...)
     end)
 
-    -- 3. HOOKING INDEX (ПОДМЕНА СТАТОВ)
+    -- Скрытие статов
     mt.__index = newcclosure(function(self, index)
         if not checkcaller() then
             if index == "WalkSpeed" then return 16 end
             if index == "JumpPower" then return 50 end
-            if index == "HipHeight" then return 0 end
         end
         return oldIndex(self, index)
-    end)
-
-    AddLog("ГИБРИДНОЕ ЯДРО БАЙПАССА ЗАПУЩЕНО ✅", "Normal")
+  end)
+  AddLog("ГИБРИДНОЕ ЯДРО БАЙПАССА АКТИВИРОВАНО ✅", "Normal")
 end
 
--- ИНТЕРФЕЙС УПРАВЛЕНИЯ
+-- ==========================================
+-- 👁 МОДУЛЬ 2: VISUALS (IPAD VIEW)
+-- ==========================================
+local function UpdateResolution()
+    if ResConnection then ResConnection:Disconnect() end
+    if ResValue == 1.0 then return end
+    ResConnection = game:GetService("RunService").RenderStepped:Connect(function()
+        Camera.CFrame = Camera.CFrame * CFrame.new(0, 0, 0, 1, 0, 0, 0, ResValue, 0, 0, 0, 1)
+    end)
+end
+
+VisualsTab:CreateSlider({
+    Name = "iPad View / Stretch Resolution",
+    Range = {0.5, 1.5},
+    Increment = 0.05,
+    Suffix = "Res",
+    CurrentValue = 1.0,
+    Flag = "ResSlider",
+    Callback = function(Value)
+        ResValue = Value
+        UpdateResolution()
+    end,
+})
+
+VisualsTab:CreateButton({
+    Name = "Reset Camera View",
+    Callback = function()
+        ResValue = 1.0
+        UpdateResolution()
+    end,
+})
+
+-- ==========================================
+-- ⚡ МОДУЛЬ 3: PERFORMANCE (120 FPS BOOST)
+-- ==========================================
+local function BoostFPS()
+    if setfpscap then setfpscap(120) end
+    
+    local l = game:GetService("Lighting")
+    l.GlobalShadows = false
+    l.FogEnd = 9e9
+    settings().Rendering.QualityLevel = 1
+
+    for _, v in pairs(game:GetDescendants()) do
+        if v:IsA("Part") or v:IsA("MeshPart") or v:IsA("BasePart") then
+            v.Material = Enum.Material.SmoothPlastic
+            v.CastShadow = false
+        elseif v:IsA("Decal") or v:IsA("Texture") or v:IsA("ParticleEmitter") or v:IsA("Trail") then
+            v.Enabled = false
+            if v:IsA("Decal") or v:IsA("Texture") then v:Destroy() end
+        end
+    end
+    AddLog("ОПТИМИЗАЦИЯ ГРАФИКИ ВЫПОЛНЕНА ⚡", "Normal")
+end
+
+BoostTab:CreateButton({
+    Name = "ACTIVATE 120 FPS BOOST",
+    Callback = function()
+        BoostFPS()
+        Rayfield:Notify({Title = "Performance", Content = "FPS Unlocked & Graphics Cleaned!", Duration = 3})
+    end,
+})
+
+BoostTab:CreateToggle({
+    Name = "Potato Mode (Remove All Mesh)",
+    CurrentValue = false,
+    Callback = function(Value)
+        if Value then
+            for _, v in pairs(game:GetDescendants()) do
+                if v:IsA("DataModelMesh") or v:IsA("CharacterMesh") then v:Destroy() end
+            end
+        end
+    end,
+})
+
+-- НАСТРОЙКИ БАЙПАССА В МЕНЮ
 BypassTab:CreateToggle({
-   Name = "Absolute Kick/Ban Protection",
-   CurrentValue = true,
-   Flag = "KickBlock",
-   Callback = function(Value) Bypasses.KickBlock = Value end,
+    Name = "Enable Anti-Kick Protection",
+    CurrentValue = true,
+    Callback = function(Value) Bypasses.KickBlock = Value end,
 })
 
 BypassTab:CreateToggle({
-   Name = "Adonis Anticheat Nuker",
-   CurrentValue = true,
-   Flag = "Adonis",
-   Callback = function(Value) Bypasses.Adonis = Value end,
+    Name = "Destroy Local Anti-Cheats",
+    CurrentValue = true,
+    Callback = function(Value) Bypasses.Adonis = Value end,
 })
 
-BypassTab:CreateToggle({
-   Name = "Rost Alpha / Engine Bypass",
-   CurrentValue = true,
-   Flag = "Rost",
-   Callback = function(Value) Bypasses.Rost = Value end,
-})
-
-BypassTab:CreateButton({
-   Name = "FORCE RE-ACTIVATE BYPASS",
-   Callback = function()
-       ActivateBypass()
-       Rayfield:Notify({Title = "SYSTEM", Content = "Bypass Core Re-synced", Duration = 2})
-   end,
-})
-
-InfoTab:CreateLabel("Zorkiy Elite v5 - Ultimate Defense")
-InfoTab:CreateLabel("TG: t.me/ayqiz_news")
-InfoTab:CreateParagraph("How it works:", "This script hooks game engine metamethods to intercept and nullify Kick/Ban commands before they reach the server.")
-
+-- ЗАПУСК
 ActivateBypass()
-AddLog("Zorkiy Guard V5 Ready. Have a safe game.", "Normal")
+AddLog("Zorkiy Elite Ultimate Loaded. Welcome, Creator.", "Normal")
