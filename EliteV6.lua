@@ -1,12 +1,12 @@
--- [[ ZORKIY ELITE V6: Final Edition]]
--- Created by Ayqiz
+-- [[ ZORKIY ELITE V12: MOBILE GOD MODE ]]
+-- Optimized for Mobile Executors (Delta, Fluxus, etc.)
 -- TG: t.me/ayqiz_news
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "ZORKIY ELITE V6 | GOD MODE",
-   LoadingTitle = "Script loaded",
+   Name = "ZORKIY ELITE V6 | MOBILE",
+   LoadingTitle = "SCRIPT LOADED",
    LoadingSubtitle = "by Ayqiz",
    ConfigurationSaving = {Enabled = true, FolderName = "ZorkiyConfigs", FileName = "EliteV6"},
    KeySystem = false
@@ -15,25 +15,23 @@ local Window = Rayfield:CreateWindow({
 local Camera = workspace.CurrentCamera
 local Player = game.Players.LocalPlayer
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
 
 local Config = {
-    AimActive = false, AimSmooth = 3, AimFOV = 150,
-    ESPActive = false, Chams = false,
+    AimActive = false, AimSmooth = 1, AimFOV = 150,
+    ESPActive = false, ChamsActive = false,
     FlingActive = false,
-    ResValue = 1.0, WalkSpeed = 16, JumpPower = 50,
-    Noclip = false, Fly = false
+    ResValue = 1.0, WalkSpeed = 16,
+    Noclip = false
 }
 
 -- ВКЛАДКИ
-local CombatTab = Window:CreateTab("🎯 Убийство")
+local CombatTab = Window:CreateTab("🎯 Бой")
 local VisualsTab = Window:CreateTab("👁 Визуалы")
 local MovementTab = Window:CreateTab("🏃 Движение")
-local BoostTab = Window:CreateTab("⚡ Оптимизация")
 local SettingsTab = Window:CreateTab("⚙️ Настройки")
 
 -- ==========================================
--- 🎯 AIMBOT (РАБОЧИЙ)
+-- 🎯 MOBILE AIMBOT (AUTO-LOCK)
 -- ==========================================
 local FOVring = Drawing.new("Circle")
 FOVring.Visible = false; FOVring.Thickness = 2; FOVring.Color = Color3.fromRGB(255, 0, 0); FOVring.Filled = false
@@ -57,64 +55,66 @@ end
 RunService.RenderStepped:Connect(function()
     FOVring.Position = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
     FOVring.Radius = Config.AimFOV
-    if Config.AimActive and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+    if Config.AimActive then
         local target = getClosestPlayer()
         if target then
-            local lookVector = (target.Character.HumanoidRootPart.Position - Camera.CFrame.Position).Unit
-            local newCFrame = CFrame.new(Camera.CFrame.Position, Camera.CFrame.Position + lookVector)
-            Camera.CFrame = Camera.CFrame:Lerp(newCFrame, 1/Config.AimSmooth)
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, target.Character.HumanoidRootPart.Position)
         end
     end
 end)
 
-CombatTab:CreateToggle({Name = "Аимбот (Прав. кнопка мыши)", CurrentValue = false, Callback = function(v) Config.AimActive = v; FOVring.Visible = v end})
-CombatTab:CreateSlider({Name = "Плавность аима", Range = {1, 10}, Increment = 1, CurrentValue = 3, Callback = function(v) Config.AimSmooth = v end})
+CombatTab:CreateToggle({Name = "Авто-Аим (Захват цели)", CurrentValue = false, Callback = function(v) Config.AimActive = v; FOVring.Visible = v end})
+CombatTab:CreateSlider({Name = "Радиус Аима (FOV)", Range = {50, 500}, Increment = 10, CurrentValue = 150, Callback = function(v) Config.AimFOV = v end})
 
 -- ==========================================
 -- 🌪 FLING (УБИЙСТВО ТИПОВ)
 -- ==========================================
 CombatTab:CreateToggle({
-    Name = "ФЛИНГ АУРА (Убивать при касании)",
+    Name = "ФЛИНГ (Убивать при касании)",
     CurrentValue = false,
     Callback = function(v)
         Config.FlingActive = v
         if v then
-            local char = Player.Character
-            local hrp = char.HumanoidRootPart
-            local vel = hrp.Velocity
             task.spawn(function()
                 while Config.FlingActive do
                     RunService.Heartbeat:Wait()
-                    hrp.Velocity = Vector3.new(5000, 5000, 5000)
-                    hrp.RotVelocity = Vector3.new(5000, 5000, 5000)
-                    -- Чтобы тебя не кикнуло, мы чередуем силу
+                    local hrp = Player.Character.HumanoidRootPart
+                    hrp.Velocity = Vector3.new(0, 10000, 0)
+                    hrp.RotVelocity = Vector3.new(10000, 10000, 10000)
                     task.wait(0.1)
-                    hrp.Velocity = vel
                 end
             end)
-            Rayfield:Notify({Title = "FLING", Content = "Подходи вплотную к игрокам, чтобы их выкинуло!", Duration = 5})
         end
     end,
 })
 
 -- ==========================================
--- 👁 ВИЗУАЛЫ (CHAMS & ESP)
+-- 👁 ВИЗУАЛЫ (REAL CHAMS)
 -- ==========================================
-local function ApplyChams(target)
-    if not target.Character then return end
-    local h = target.Character:FindFirstChild("ZorkiyHighlight") or Instance.new("Highlight", target.Character)
-    h.Name = "ZorkiyHighlight"
-    h.FillColor = Color3.fromRGB(255, 0, 0)
-    h.OutlineColor = Color3.fromRGB(255, 255, 255)
-    h.Enabled = Config.Chams
+local function UpdateChams()
+    for _, p in pairs(game.Players:GetPlayers()) do
+        if p ~= Player and p.Character then
+            local highlight = p.Character:FindFirstChild("AyqizChams")
+            if Config.ChamsActive then
+                if not highlight then
+                    highlight = Instance.new("Highlight", p.Character)
+                    highlight.Name = "AyqizChams"
+                end
+                highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                highlight.FillOpacity = 0.5
+                highlight.Enabled = true
+            elseif highlight then
+                highlight.Enabled = false
+            end
+        end
+    end
 end
 
-VisualsTab:CreateToggle({Name = "Чамсы (Подсветка тел)", CurrentValue = false, Callback = function(v) 
-    Config.Chams = v 
-    for _, p in pairs(game.Players:GetPlayers()) do if p ~= Player then ApplyChams(p) end end
+VisualsTab:CreateToggle({Name = "НЕОНОВЫЕ ЧАМСЫ (Силуэты)", CurrentValue = false, Callback = function(v) 
+    Config.ChamsActive = v 
+    UpdateChams()
 end})
-
-VisualsTab:CreateToggle({Name = "Неоновый ESP (Боксы)", CurrentValue = false, Callback = function(v) Config.ESPActive = v end})
 
 VisualsTab:CreateSlider({Name = "iPad View (Растяг)", Range = {0.5, 1.5}, Increment = 0.05, CurrentValue = 1.0, Callback = function(v) 
     Config.ResValue = v
@@ -125,37 +125,23 @@ VisualsTab:CreateSlider({Name = "iPad View (Растяг)", Range = {0.5, 1.5}, 
 end})
 
 -- ==========================================
--- 🏃 ДВИЖЕНИЕ
+-- 🏃 ДВИЖЕНИЕ & PERFORMANCE
 -- ==========================================
-MovementTab:CreateSlider({Name = "Скорость бега", Range = {16, 500}, Increment = 5, CurrentValue = 16, Callback = function(v) Config.WalkSpeed = v end})
-MovementTab:CreateToggle({Name = "Ноуклип (Сквозь стены)", CurrentValue = false, Callback = function(v) Config.Noclip = v end})
-
-RunService.Stepped:Connect(function()
-    pcall(function()
-        Player.Character.Humanoid.WalkSpeed = Config.WalkSpeed
-        if Config.Noclip then
-            for _, v in pairs(Player.Character:GetDescendants()) do
-                if v:IsA("BasePart") then v.CanCollide = false end
-            end
-        end
-    end)
-end)
-
--- ==========================================
--- ⚡ ОПТИМИЗАЦИЯ
--- ==========================================
-BoostTab:CreateButton({Name = "УЛЬТРА БУСТ 120 ФПС", Callback = function()
+MovementTab:CreateSlider({Name = "Скорость", Range = {16, 300}, Increment = 5, CurrentValue = 16, Callback = function(v) Config.WalkSpeed = v end})
+MovementTab:CreateButton({Name = "БУСТ 120 ФПС", Callback = function()
     if setfpscap then setfpscap(120) end
     for _, v in pairs(game:GetDescendants()) do
         if v:IsA("BasePart") then v.Material = "SmoothPlastic"; v.CastShadow = false end
-        if v:IsA("Decal") or v:IsA("Texture") then v:Destroy() end
     end
 end})
 
 -- ==========================================
 -- ⚙️ НАСТРОЙКИ
 -- ==========================================
-SettingsTab:CreateButton({Name = "Копировать ТГ: t.me/ayqiz_news", Callback = function() setclipboard("t.me/ayqiz_news") end})
-SettingsTab:CreateButton({Name = "⛔ ВЫКЛЮЧИТЬ СКРИПТ", Callback = function() Rayfield:Destroy() end})
+SettingsTab:CreateButton({Name = "Телеграм: t.me/ayqiz_news", Callback = function() setclipboard("https://t.me/ayqiz_news") end})
+SettingsTab:CreateButton({Name = "⛔ ОСТАНОВИТЬ СКРИПТ", Callback = function() Rayfield:Destroy() end})
 
-Rayfield:Notify({Title = "ZORKIY V11", Content = "МОД АКТИВИРОВАН. УДАЧНОЙ ОХОТЫ.", Duration = 5})
+game.Players.PlayerAdded:Connect(function() if Config.ChamsActive then task.wait(1) UpdateChams() end end)
+RunService.Stepped:Connect(function() pcall(function() Player.Character.Humanoid.WalkSpeed = Config.WalkSpeed end) end)
+
+Rayfield:Notify({Title = "ZORKIY V6 MOBILE", Content = "Mobile Script", Duration = 5})
